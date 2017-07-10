@@ -1,18 +1,42 @@
 <template>
   <div id="add-blog">
     <h2>Add a new Blog Post</h2>
-    <form action="">
+    <form action="" v-if="!submitted">
       <label>Blog Title:</label>
       <input type="text" v-model.lazy="blog.title" required>
       <label>Blog Content:</label>
       <textarea v-model.lazy="blog.content"></textarea>
-      <div id="preview">
-        <h3>Preview Blog</h3>
-        <p>Blog title: {{ blog.title }}</p>
-        <p>Blog content:</p>
-        <p>{{ blog.content }}</p>
+      <div id="checkboxes">
+        <label for="ninjas">Ninjas</label>
+        <input type="checkbox" v-model="blog.categories" value="ninjas" id="ninjas">
+        <label for="wizards">Wizards</label>
+        <input type="checkbox" v-model="blog.categories" value="wizards" id="wizards">
+        <label for="mario">Mario</label>
+        <input type="checkbox" v-model="blog.categories" value="mario" id="mario">
+        <label for="cheese">Cheese</label>
+        <input type="checkbox" v-model="blog.categories" value="cheese" id="cheese">
       </div>
+      <label>Author</label>
+      <select v-model="blog.author">
+        <option value="">Select an author</option>
+        <option v-for="author in authors">{{ author }}</option>
+      </select>
+      <button @click.prevent="post">Add Blog</button>
     </form>
+    <div v-if="submitted">
+      <h3>Thanks for adding your post</h3>
+    </div>
+    <div id="preview">
+      <h3>Preview Blog</h3>
+      <p>Blog title: {{ blog.title }}</p>
+      <p>Blog content:</p>
+      <p>{{ blog.content }}</p>
+      <p>Blog Categories:</p>
+      <ul>
+        <li v-for="category in blog.categories">{{category}}</li>
+      </ul>
+      <p>author: {{ blog.author}}</p>
+    </div>
 
   </div>
 </template>
@@ -23,12 +47,29 @@ export default {
     return {
       blog: {
         title: '',
-        content: ''
-      }
+        content: '',
+        categories: [],
+        author: ''
+      },
+      authors: [
+        'The net ninja',
+        'The angular avenger',
+        'The vue vindicator'
+      ],
+      submitted: false
     }
   },
   methods: {
-
+    post: function () {
+      this.$http.post('https://jsonplaceholder.typicode.com/posts', {
+        title: this.blog.title,
+        body: this.blog.content,
+        userId: 1
+      }).then(function (data) {
+        console.log(data)
+        this.submitted = true
+      })
+    }
   }
 }
 </script>
@@ -57,5 +98,14 @@ input[type="text"], textarea {
 }
 h3 {
     margin-top: 10px;
+}
+
+#checkboxes input {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+#checkboxes label {
+  display: inline-block;
 }
 </style>
